@@ -10,7 +10,7 @@
  Tools used: 
  * Microsoft Excel
  * SQL Server Management Studio
- * Tableau Dashboard
+ * [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16816646606030/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
  
  ### The Data
  
