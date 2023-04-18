@@ -1,5 +1,5 @@
 <p align = "center">
-	<img src="https://user-images.githubusercontent.com/126125206/232331834-ad55c64c-a487-4939-8b45-33198c477b44.jpg" width="285" height="160"/>
+	<img src="https://user-images.githubusercontent.com/126125206/232331834-ad55c64c-a487-4939-8b45-33198c477b44.jpg" width="285" height="170"/>
 	
 <h1 align="center"> COVID-19 Analysis </h1>
 
@@ -59,7 +59,7 @@ WHERE continent=''
 ```
 
 # Analysing Insights
-First look at the data: 
+### First look at the data: 
 ```
 --- Selecting data we're going to be using
 SELECT location, date, total_cases, new_cases, total_deaths, population
@@ -84,5 +84,42 @@ As of March 19th 2020, the death rate in Puerto Rico had reached 4% compared to 
 
 <img width="474" alt="initial deaths in pr " src="https://user-images.githubusercontent.com/126125206/232587639-95ffb3b3-4cc4-4562-9775-2a577869c4f8.png">
 <img width="474" alt="initial deaths in us " src="https://user-images.githubusercontent.com/126125206/232593180-4e6730bd-9dfa-48db-9222-7abb90b943f5.png">
+
+### Looking at total cases vs population 
+As of the day I downloaded the dataset, which was April 12th, 2023, Puerto Rico had a total of 1,110,017 COVID-19 cases, accounting for 34.12% of its population. In comparison, the United States had 102,873,924 cases, representing 30.41% of its population. 
+
+<img width="474" alt="total cases in us" src="https://user-images.githubusercontent.com/126125206/232635496-ce560c45-5fe5-4863-be22-85d10b8cb38e.png">  
+<img width="460" alt="total cases in pr" src="https://user-images.githubusercontent.com/126125206/232635497-bc61a91f-631c-4980-802a-9d48e3137555.png">
+
+```
+--- Total cases vs Population
+SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
+FROM covid. dbo.covid_deaths
+WHERE location = 'Puerto Rico'
+ORDER BY percentage_population_infected DESC
+
+SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
+FROM covid. dbo.covid_deaths
+WHERE location = 'United States'
+ORDER BY percentage_population_infected DESC
+```
+
+### Countries with the **highest infection** rates 
+Top 5 countries with highest infection rates: 
+1. Cyprus - 655,664 - 73.2% of total population
+2. San Marino - 23,873 - 70.8% of total population  
+3. Autria - 6,046,956 - 67.6% of total population
+4. Faeroe Islands - 34,658 - 65.2% of total population
+5. Brunei - 284,632 - 63.4% of total population
+
+Puerto Rico ranked #58 with 1,110,017 total cases or 34.1% of the population. The United States ranked #68 with 102,873,924 total cases or 30.4% of the population. Here's my code: 
+```
+--- Looking at countries with highest infection rates compared to population
+SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((ROUND(total_cases/population,6)*100)) AS percentage_population_infected
+FROM covid. dbo.covid_deaths
+GROUP BY location, population
+ORDER BY percentage_population_infected DESC;
+```
+
 
 # Sharing My Results 
