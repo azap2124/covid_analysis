@@ -70,12 +70,14 @@ ORDER BY 1,2
 I was interested in analyzing the situation in Puerto Rico during the pandemic. Unfortunately, the initial findings were concerning, as the island had already recorded its first death out of the 24 reported cases within the first three months of 2020. 
 ```
 --- Total cases vs Total deaths in Puerto Rico
-SELECT location, date, total_cases, total_deaths, ROUND(total_deaths/total_cases,4)*100 AS death_percentage
+SELECT location, date, total_cases, total_deaths, 
+	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE location='Puerto Rico' AND continent IS NOT NULL
 ORDER BY 1,2
 
-SELECT location, date, total_cases, total_deaths, ROUND(total_deaths/total_cases,4)*100 AS death_percentage
+SELECT location, date, total_cases, total_deaths, 
+	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE location='United States' AND continent IS NOT NULL
 ORDER BY 1,2
@@ -93,12 +95,14 @@ As of the day I downloaded the dataset, which was April 12th, 2023, Puerto Rico 
 
 ```
 --- Total cases vs Population
-SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
+SELECT location, date, population, total_cases, 
+	ROUND(total_cases/population,6)*100 AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 WHERE location = 'Puerto Rico'
 ORDER BY percentage_population_infected DESC
 
-SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
+SELECT location, date, population, total_cases, 
+	ROUND(total_cases/population,6)*100 AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 WHERE location = 'United States'
 ORDER BY percentage_population_infected DESC
@@ -115,11 +119,45 @@ Top 5 countries with highest infection rates:
 Puerto Rico ranked #58 with 1,110,017 total cases or 34.1% of the population. The United States ranked #68 with 102,873,924 total cases or 30.4% of the population. Here's my code: 
 ```
 --- Looking at countries with highest infection rates compared to population
-SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((ROUND(total_cases/population,6)*100)) AS percentage_population_infected
+SELECT location, population, 
+	MAX(total_cases) AS highest_infection_count, 
+	ROUND((MAX(total_cases)/MAX(population)*100),6) AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 GROUP BY location, population
 ORDER BY percentage_population_infected DESC;
 ```
 
+### Countries with highest death rates
+The top 5 countries with the highest death counts were: 
+1. United States - 1,118,800
+2. Brazil - 700,556
+3. India - 531,000
+4. Russia - 397,642
+5. Mexico - 333,596
+
+Nonetheless, these countries have vast amounts of populations due to their size. I decided to look for the top five countries with the highest death rates: 
+1. Yemen - 18.07% with 2,159 deaths 
+2. Sudan - 7.86% with 5,034 deaths 
+3. Syria - 5.5% with 3,163 deaths 
+4. Somalia - 4.98% with 1,361 deaths 
+5. Peru - 4.89% with 219,866
+```
+--- Showing countries with the highest death rates compared to total cases
+SELECT TOP 5 location,
+       MAX(total_deaths) AS total_deaths
+FROM covid.dbo.covid_deaths
+WHERE continent IS NOT NULL
+GROUP BY location
+ORDER BY total_deaths DESC;
+
+SELECT TOP 5 location,
+	   MAX(total_cases) AS total_cases,
+       MAX(total_deaths) AS total_deaths,
+       ROUND(MAX(total_deaths)/MAX(total_cases)*100, 4) AS death_rate
+FROM covid.dbo.covid_deaths
+WHERE continent IS NOT NULL
+GROUP BY location
+ORDER BY death_rate DESC;
+```
 
 # Sharing My Results 
