@@ -21,7 +21,7 @@
  * [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16816646606030/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
  
  ### The Data
-I utilized a dataset from Our World in Data, a non-profit scientific online publication website that addresses critical global issues, including poverty, disease, hunger, climate change, war, existential risks, and inequality. You can access the dataset through this link: https://ourworldindata.org/covid-deaths.  
+I utilized a dataset from Our World in Data, a non-profit scientific online publication website that addresses critical global issues, including poverty, disease, hunger, climate change, war, existential risks, and inequality. You can access the dataset through this link: https://ourworldindata.org/covid-deaths  
 	
 The dataset I used is extensive and has been consistently updated on a daily basis since the start of the COVID-19 pandemic. For my analysis, I specifically focused on key aspects of the dataset, including population, dates, locations, cases, deaths, and vaccinations.  
 
@@ -145,7 +145,9 @@ Nonetheless, these countries have vast amounts of populations due to their size.
 5. Peru - 4.89% with 219,866  
 
 (#157 Puerto Rico - 0.53%)  
-(#97 United States - 1.09%)
+(#97 United States - 1.09%)  
+
+Code: 
 ```
 --- Showing countries with the highest death rates compared to total cases
 SELECT TOP 5 location,
@@ -163,6 +165,39 @@ FROM covid.dbo.covid_deaths
 WHERE continent IS NOT NULL
 GROUP BY location
 ORDER BY death_rate DESC;
+
+```
+### Breaking things down by social class
+I was interested in analyzing how each social class was affected during the pandemic. The dataset provided us with three categories: High income, Upper middle income, Lower middle income, and low income.  
+```
+--- Breaking things down by social class
+
+SELECT location,
+	MAX(CAST(total_deaths AS INT)) AS total_death_count 
+FROM covid. dbo.covid_deaths
+WHERE continent IS NULL AND
+		location IN ('Low income', 'High income','Upper middle income', 'Lower middle income','Low income')
+GROUP BY location
+ORDER BY total_death_count DESC;
+```
+Results: 
+High income: 2,850,794
+Upper middle income: 2,654,361
+Lower middle income: 1,340,036
+Low income: 47,888
+
+It can be observed that households categorized as upper and lower middle income, as well as low income, experienced the highest number of total deaths at 4,042,285. This could be attributed to factors such as access to quality healthcare facilities. Notably, low income households had a comparatively lower count of 47,888 deaths, which may seem disproportionately low compared to the other groups. However, it's important to consider that limited access to healthcare services for low income households could potentially lead to underreporting of COVID-19 cases and deaths.
+
+### Global numbers
+As of April 12,2023, the total number of confirmed COVID-19 cases is **763,128,258**, with **6,899,687** reported deaths, accounting for approximately **0.904%** of the total cases. I got these numbers from the following code: 
+```
+SELECT 
+	SUM(new_cases) AS total_cases, 
+	SUM(new_deaths) AS total_deaths, 
+	SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
+FROM covid. dbo.covid_deaths
+WHERE continent IS NOT NULL
+ORDER BY 1,2
 ```
 
 # Sharing My Results 
