@@ -133,14 +133,19 @@ The top 5 countries with the highest death counts were:
 2. Brazil - 700,556
 3. India - 531,000
 4. Russia - 397,642
-5. Mexico - 333,596
+5. Mexico - 333,596  
+
+(#84 Puerto Rico - 5,867) 
 
 Nonetheless, these countries have vast amounts of populations due to their size. I decided to look for the top five countries with the highest death rates: 
 1. Yemen - 18.07% with 2,159 deaths 
 2. Sudan - 7.86% with 5,034 deaths 
 3. Syria - 5.5% with 3,163 deaths 
 4. Somalia - 4.98% with 1,361 deaths 
-5. Peru - 4.89% with 219,866
+5. Peru - 4.89% with 219,866  
+
+(#157 Puerto Rico - 0.53%)  
+(#97 United States - 1.09%)
 ```
 --- Showing countries with the highest death rates compared to total cases
 SELECT TOP 5 location,
