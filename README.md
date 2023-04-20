@@ -18,7 +18,7 @@
  Tools used: 
  * Microsoft Excel
  * SQL Server Management Studio
- * [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16816646606030/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
+ * [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16820174746020/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link)
  
  ### The Data
 I utilized a dataset from Our World in Data, a non-profit scientific online publication website that addresses critical global issues, including poverty, disease, hunger, climate change, war, existential risks, and inequality. You can access the dataset through this link: https://ourworldindata.org/covid-deaths  
@@ -253,40 +253,24 @@ ORDER BY location;
 ``` 
 
 # Sharing My Results 
-I created the following views for later visualization: 
+Here's the link to my [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16820174746020/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link) for this project.  
+
+#### Visualizing total death counts by continent:   
+<img width="205" alt="column chart" src="https://user-images.githubusercontent.com/126125206/233473836-ba28a0d2-55f7-4583-ba7c-0c9cc78dbd4b.png">  
+As you can see, Europe had the most death counts with over 2 million deaths. Asia was close second with 1.6 million deaths. 
+
+#### Average of the population infected over three years for Puerto Rico, United States, China, India and Mexico: 
+<img width="705" alt="line graph" src="https://user-images.githubusercontent.com/126125206/233473837-2ce9145e-887a-4ebe-9785-68b52e22bc49.png">  
+
+#### How each social class was affected by the pandemic (death counts): 
+<img width="545" alt="pie chart" src="https://user-images.githubusercontent.com/126125206/233473834-6519ba16-1036-4b2c-afb1-19ee6109567f.png">  
+
+#### A map depicting the nations that have the most concentrated COVID-19 cases:
+<img width="518" alt="map" src="https://user-images.githubusercontent.com/126125206/233473831-87afba1a-56a9-486d-98de-372651ec6a85.png">
+
+
+I created the following views for visualization purposes in SQL Server: 
 ```
---- Creating view to store data for later visualization
-GO
-
-CREATE VIEW percentage_population_vaccinated AS 
-WITH pop_vs_vac(continent, location, date, population, new_vaccinations, rolling_vaccinations)
-AS 
-(
-SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
-SUM(vac.new_vaccinations) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_vaccinations
-FROM covid..covid_deaths dea
-JOIN covid..covid_vaccinations vac
-	ON dea.location = vac.location AND dea.date = vac.date
-WHERE dea.continent IS NOT NULL
-)
-SELECT *, ROUND(rolling_vaccinations/population,5)*100 AS percent_vaccinated
-FROM pop_vs_vac 
-
-GO
-
-CREATE VIEW basic_data AS
-SELECT location, date, total_cases, new_cases, total_deaths, population
-FROM covid. dbo.covid_deaths
-
-GO
-
-SELECT * from basic_data
-
-CREATE VIEW death_percentage_pr AS 
-SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS death_percentage
-FROM covid. dbo.covid_deaths
-WHERE location='Puerto Rico' AND continent IS NOT NULL
-
 GO
 
 CREATE VIEW death_percentage_world AS 
@@ -296,24 +280,11 @@ WHERE continent IS NOT NULL
 
 GO
 
-CREATE VIEW total_cases_vs_population AS 
-SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
-FROM covid. dbo.covid_deaths
-
-GO
-
 CREATE VIEW highest_infection_rate AS
 SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((ROUND(total_cases/population,6)*100)) AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 GROUP BY location, population
 
-GO
-
-CREATE VIEW highest_death_count AS
-SELECT location, MAX(CAST(total_deaths AS INT)) AS total_death_count 
-FROM covid. dbo.covid_deaths
-WHERE continent IS NOT NULL
-GROUP BY location
 
 GO
 
@@ -329,15 +300,5 @@ CREATE VIEW global_numbers AS
 SELECT SUM(new_cases) AS total_cases, SUM(new_deaths) AS total_deaths, SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
-
-GO
-
-CREATE VIEW population_vaccinated AS
-SELECT dea.continent, dea. location, dea.date, dea.population, vac.new_vaccinations,
-SUM(vac.new_vaccinations) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_vaccinations
-FROM covid..covid_deaths dea
-JOIN covid..covid_vaccinations vac
-	ON dea.location = vac.location AND dea.date = vac.date
-WHERE dea.continent IS NOT NULL
 ```
-Here's the link to my Tableau Dashboard
+
