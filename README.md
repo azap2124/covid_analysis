@@ -200,4 +200,27 @@ WHERE continent IS NOT NULL
 ORDER BY 1,2
 ```
 
+### Vaccinations 
+#### Percentage of people vaccinated
+I used a CTE to perform calculations. 
+```
+WITH pop_vs_vac(continent, location, date, population, people_vaccinated)
+AS 
+(
+    SELECT dea.continent, dea.location, dea.date, dea.population, 
+	MAX(vac.people_vaccinated) OVER (PARTITION BY dea.location ORDER BY dea. location, dea.date) AS total_people_vaccinated
+    FROM covid..covid_deaths dea
+    JOIN covid..covid_vaccinations vac
+    ON dea.location = vac.location AND dea.date = vac.date
+    WHERE dea.continent IS NOT NULL
+)
+SELECT *,
+    ROUND((people_vaccinated/population)*100,5) AS percent_vaccinated
+FROM pop_vs_vac
+WHERE location = 'United States')
+ORDER BY location, date
+``` 
+As of April 12, 2023 the total number of people vaccinated in the United States is 338,289,856 or 79.8275 of the total population. 
+
+Initially, I observed that there was no data available for the "new_vaccinations" column for Puerto Rico. In order to investigate this further, I revisited the Excel spreadsheet to analyze the original data. It turns out that Puerto Rico indeed was missing that data. After further investigation in their website, I was not able to find a reason as to why this is. However [this article](https://www.aha.org/news/blog/2022-07-22-digging-reasons-puerto-ricos-successful-covid-19-response) from the American Hospital Association estimates that 95% of the population has received at least one dose of the vaccine. 
 # Sharing My Results 
