@@ -220,7 +220,36 @@ FROM pop_vs_vac
 WHERE location = 'United States')
 ORDER BY location, date
 ``` 
-As of April 12, 2023 the total number of people vaccinated in the United States is 338,289,856 or 79.8275 of the total population. 
+As of April 12, 2023 the total number of people vaccinated in the United States is **338,289,856** or **79.828%** of the total population. 
 
-Initially, I observed that there was no data available for the "new_vaccinations" column for Puerto Rico. In order to investigate this further, I revisited the Excel spreadsheet to analyze the original data. It turns out that Puerto Rico indeed was missing that data. After further investigation in their website, I was not able to find a reason as to why this is. However, [this article](https://www.aha.org/news/blog/2022-07-22-digging-reasons-puerto-ricos-successful-covid-19-response) from the American Hospital Association, estimates that 95% of the population has received at least one dose of the vaccine. 
+Initially, I observed that there was no data available for the "new_vaccinations" column for Puerto Rico. In order to investigate this further, I revisited the Excel spreadsheet to analyze the original data. It turns out that Puerto Rico indeed was missing this data. After further investigation in their website, I was not able to find a reason as to why this is. However, [this article](https://www.aha.org/news/blog/2022-07-22-digging-reasons-puerto-ricos-successful-covid-19-response) from the American Hospital Association, estimates that 95% of the population has received at least one dose of the vaccine. 
+
+I then created a temp table to summarize all this data by country. 
+```
+DROP TABLE IF EXISTS #percent_population_vaccinated
+CREATE TABLE #percent_population_vaccinated
+(
+continent NVARCHAR(255), 
+location NVARCHAR(255), 
+date DATETIME, 
+population NUMERIC,
+total_people_vaccinated NUMERIC
+);
+
+INSERT INTO #percent_population_vaccinated
+SELECT dea.continent, dea.location, dea.date, dea.population, 
+MAX(vac.people_vaccinated) OVER (PARTITION BY dea.location ORDER BY dea. location, dea.date) AS total_people_vaccinated
+FROM covid..covid_deaths dea
+JOIN covid..covid_vaccinations vac
+	ON dea.location = vac.location AND dea.date = vac.date;
+
+SELECT location, 
+       MAX(population) AS population, 
+       MAX(total_people_vaccinated) AS total_people_vaccinated,
+       (MAX(total_people_vaccinated) / MAX(population)) * 100 AS percent_vaccinated
+FROM #percent_population_vaccinated
+GROUP BY location
+ORDER BY location;
+``` 
+
 # Sharing My Results 
