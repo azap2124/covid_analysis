@@ -253,3 +253,91 @@ ORDER BY location;
 ``` 
 
 # Sharing My Results 
+I created the following views for later visualization: 
+```
+--- Creating view to store data for later visualization
+GO
+
+CREATE VIEW percentage_population_vaccinated AS 
+WITH pop_vs_vac(continent, location, date, population, new_vaccinations, rolling_vaccinations)
+AS 
+(
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
+SUM(vac.new_vaccinations) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_vaccinations
+FROM covid..covid_deaths dea
+JOIN covid..covid_vaccinations vac
+	ON dea.location = vac.location AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+)
+SELECT *, ROUND(rolling_vaccinations/population,5)*100 AS percent_vaccinated
+FROM pop_vs_vac 
+
+GO
+
+CREATE VIEW basic_data AS
+SELECT location, date, total_cases, new_cases, total_deaths, population
+FROM covid. dbo.covid_deaths
+
+GO
+
+SELECT * from basic_data
+
+CREATE VIEW death_percentage_pr AS 
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS death_percentage
+FROM covid. dbo.covid_deaths
+WHERE location='Puerto Rico' AND continent IS NOT NULL
+
+GO
+
+CREATE VIEW death_percentage_world AS 
+SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS death_percentage
+FROM covid. dbo.covid_deaths
+WHERE continent IS NOT NULL
+
+GO
+
+CREATE VIEW total_cases_vs_population AS 
+SELECT location, date, population, total_cases, (ROUND(total_cases/population,6)*100) AS percentage_population_infected
+FROM covid. dbo.covid_deaths
+
+GO
+
+CREATE VIEW highest_infection_rate AS
+SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((ROUND(total_cases/population,6)*100)) AS percentage_population_infected
+FROM covid. dbo.covid_deaths
+GROUP BY location, population
+
+GO
+
+CREATE VIEW highest_death_count AS
+SELECT location, MAX(CAST(total_deaths AS INT)) AS total_death_count 
+FROM covid. dbo.covid_deaths
+WHERE continent IS NOT NULL
+GROUP BY location
+
+GO
+
+CREATE VIEW death_count_continent AS
+SELECT location, MAX(CAST(total_deaths AS INT)) AS total_death_count 
+FROM covid. dbo.covid_deaths
+WHERE continent IS NULL
+GROUP BY location
+
+GO 
+
+CREATE VIEW global_numbers AS
+SELECT SUM(new_cases) AS total_cases, SUM(new_deaths) AS total_deaths, SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
+FROM covid. dbo.covid_deaths
+WHERE continent IS NOT NULL
+
+GO
+
+CREATE VIEW population_vaccinated AS
+SELECT dea.continent, dea. location, dea.date, dea.population, vac.new_vaccinations,
+SUM(vac.new_vaccinations) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_vaccinations
+FROM covid..covid_deaths dea
+JOIN covid..covid_vaccinations vac
+	ON dea.location = vac.location AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+```
+Here's the link to my Tableau Dashboard
