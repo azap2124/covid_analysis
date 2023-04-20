@@ -301,4 +301,5 @@ SELECT SUM(new_cases) AS total_cases, SUM(new_deaths) AS total_deaths, SUM(new_d
 FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
 ```
+# Conclusion
 
