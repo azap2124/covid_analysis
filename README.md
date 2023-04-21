@@ -62,7 +62,7 @@ WHERE continent='';
 SELECT location, date, total_cases, new_cases, total_deaths, population
 FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
-ORDER BY 1,2;
+ORDER BY location, date;
 ```
 I was interested in analyzing the situation in Puerto Rico during the pandemic. Unfortunately, the initial findings were concerning, as the island had already recorded its first death out of the 24 reported cases within the first three months of 2020. 
 ```
@@ -71,13 +71,13 @@ SELECT location, date, total_cases, total_deaths,
 	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE location = 'Puerto Rico' AND continent IS NOT NULL
-ORDER BY 1,2;
+ORDER BY location, date;
 
 SELECT location, date, total_cases, total_deaths, 
 	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE location = 'United States' AND continent IS NOT NULL
-ORDER BY 1,2;
+ORDER BY location, date;
 ```
 As of March 19th 2020, the death rate in Puerto Rico had reached 4% compared to total cases, indicating a significant and concerning impact of the pandemic on the island. 
 
@@ -186,13 +186,13 @@ It can be observed that households categorized as upper and lower middle income,
 ### Global numbers
 As of April 12,2023, the total number of confirmed COVID-19 cases is **763,128,258**, with **6,899,687** reported deaths, accounting for approximately **0.904%** of the total cases. I got these numbers from the following code: 
 ```
+--- Global numbers
 SELECT 
 	SUM(new_cases) AS total_cases, 
 	SUM(new_deaths) AS total_deaths, 
 	SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
-WHERE continent IS NOT NULL
-ORDER BY 1,2;
+WHERE continent IS NOT NULL;
 ```
 
 ### Vaccinations 
@@ -250,19 +250,24 @@ ORDER BY percent_vaccinated DESC;
 # Sharing My Results 
 Here's the link to my [Tableau Dashboard](https://public.tableau.com/views/CovidProject_16820174746020/Dashboard1?:language=en-US&:display_count=n&:origin=viz_share_link) for this project.  
 
-#### Visualizing total death counts by continent:   
-<img width="205" alt="column chart" src="https://user-images.githubusercontent.com/126125206/233473836-ba28a0d2-55f7-4583-ba7c-0c9cc78dbd4b.png">  
-As you can see, Europe had the most death counts with over 2 million deaths. Asia was close second with 1.6 million deaths. 
-
+#### Visualizing total death counts by continent:
+*As you can see, Europe had the most death counts with over 2 million deaths. Asia was close second with 1.6 million deaths.
+    <br/><br/>
+<img width="305" alt="column chart" src="https://user-images.githubusercontent.com/126125206/233473836-ba28a0d2-55f7-4583-ba7c-0c9cc78dbd4b.png">    
+    <br/><br/>
+  
 #### Average of the population infected over three years for Puerto Rico, United States, China, India and Mexico: 
-<img width="705" alt="line graph" src="https://user-images.githubusercontent.com/126125206/233473837-2ce9145e-887a-4ebe-9785-68b52e22bc49.png">  
-
+<img width="605" alt="line graph" src="https://user-images.githubusercontent.com/126125206/233473837-2ce9145e-887a-4ebe-9785-68b52e22bc49.png">   
+  <br/><br/>
+  
 #### How each social class was affected by the pandemic (death counts): 
 <img width="545" alt="pie chart" src="https://user-images.githubusercontent.com/126125206/233473834-6519ba16-1036-4b2c-afb1-19ee6109567f.png">  
-
+    <br/><br/>
+  
 #### A map depicting the nations that have the most concentrated COVID-19 cases:
-<img width="518" alt="map" src="https://user-images.githubusercontent.com/126125206/233473831-87afba1a-56a9-486d-98de-372651ec6a85.png">
-
+*The darker shaded the country, the highest infection rates.  
+<img width="518" alt="map" src="https://user-images.githubusercontent.com/126125206/233473831-87afba1a-56a9-486d-98de-372651ec6a85.png">  
+<br></br>
 
 I created the following views for visualization purposes: 
 ```
@@ -271,14 +276,14 @@ GO
 CREATE VIEW death_percentage_world AS 
 SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
-WHERE continent IS NOT NULL
+WHERE continent IS NOT NULL;
 
 GO
 
 CREATE VIEW highest_infection_rate AS
 SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX((ROUND(total_cases/population,6)*100)) AS percentage_population_infected
 FROM covid. dbo.covid_deaths
-GROUP BY location, population
+GROUP BY location, population;
 
 
 GO
@@ -287,14 +292,14 @@ CREATE VIEW death_count_continent AS
 SELECT location, MAX(CAST(total_deaths AS INT)) AS total_death_count 
 FROM covid. dbo.covid_deaths
 WHERE continent IS NULL
-GROUP BY location
+GROUP BY location;
 
 GO 
 
 CREATE VIEW global_numbers AS
 SELECT SUM(new_cases) AS total_cases, SUM(new_deaths) AS total_deaths, SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
-WHERE continent IS NOT NULL
+WHERE continent IS NOT NULL;
 ```
 # Conclusion
 It's no doubt that COVID-19 has had a huge impacts in our lives. The virus has affected people from all walks of lives. This project demonstrates the significant impact of the pandemic on global healthcare systems, with widespread infections resulting in high death rates and a large number of fatalities. There has been 763,128,258 cases of COVID-19 as of April 12,2023 with over 6,899,687 deaths worldwide. These figures are staggering. Nonetheless, vaccinations have been promising about reducing th number of infections and deaths.
