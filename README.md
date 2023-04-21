@@ -9,6 +9,7 @@
 * [Processing the Data](https://github.com/azap2124/covid_analysis/edit/main/README.md#processing-the-data)
 * [Analyzing Insights](https://github.com/azap2124/covid_analysis/edit/main/README.md#analysing-insights)
 * [Sharing My Results](https://github.com/azap2124/covid_analysis/edit/main/README.md#sharing-my-results)
+* [Conclusion](https://github.com/azap2124/covid_analysis/edit/main/README.md#conclusion)
   
  # Introduction 
  The ongoing COVID-19 pandemic has significantly affected our daily lives. This data analysis aims to provide an exploratory examination of infection rates, deaths, and vaccination rates.  
@@ -37,25 +38,21 @@ As part of my data cleaning process, I utilized SQL Server's Design tool to upda
 ```
 --- Changing zeros to NULLs in order to perform calculations 
 UPDATE covid_deaths
-SET total_cases = CASE 
-                    WHEN total_cases = 0 THEN NULL
-                    ELSE total_cases
-				 END
+SET continent = NULL
+WHERE continent = 0;
+
 UPDATE covid_deaths
-SET new_cases = CASE 
-                    WHEN new_cases = 0 THEN NULL
-                    ELSE new_cases
-				 END
+SET total_cases = NULL
+WHERE total_cases = 0;
+
 UPDATE covid_deaths
-SET total_deaths = CASE 
-                    WHEN total_deaths = 0 THEN NULL
-                    ELSE total_deaths
-				 END;
+SET total_deaths = NULL
+WHERE total_deaths = 0;
 
 --- Setting blank spaces to NULLs in the continent column 
 UPDATE covid_deaths
 SET continent = NULL
-WHERE continent=''
+WHERE continent='';
 ```
 
 # Analysing Insights
@@ -65,7 +62,7 @@ WHERE continent=''
 SELECT location, date, total_cases, new_cases, total_deaths, population
 FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
-ORDER BY 1,2
+ORDER BY 1,2;
 ```
 I was interested in analyzing the situation in Puerto Rico during the pandemic. Unfortunately, the initial findings were concerning, as the island had already recorded its first death out of the 24 reported cases within the first three months of 2020. 
 ```
@@ -73,16 +70,16 @@ I was interested in analyzing the situation in Puerto Rico during the pandemic. 
 SELECT location, date, total_cases, total_deaths, 
 	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
-WHERE location='Puerto Rico' AND continent IS NOT NULL
-ORDER BY 1,2
+WHERE location = 'Puerto Rico' AND continent IS NOT NULL
+ORDER BY 1,2;
 
 SELECT location, date, total_cases, total_deaths, 
 	ROUND(total_deaths/total_cases,4)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
-WHERE location='United States' AND continent IS NOT NULL
-ORDER BY 1,2
+WHERE location = 'United States' AND continent IS NOT NULL
+ORDER BY 1,2;
 ```
-As of March 19th 2020, the death rate in Puerto Rico had reached 4% compared to total cases, indicating a significant and concerning impact of the pandemic on the island. The United States had a lot more deaths (149) but in comparison to total cases, this number was just over 1%. 
+As of March 19th 2020, the death rate in Puerto Rico had reached 4% compared to total cases, indicating a significant and concerning impact of the pandemic on the island. 
 
 <img width="474" alt="initial deaths in pr " src="https://user-images.githubusercontent.com/126125206/232587639-95ffb3b3-4cc4-4562-9775-2a577869c4f8.png">
 <img width="474" alt="initial deaths in us " src="https://user-images.githubusercontent.com/126125206/232593180-4e6730bd-9dfa-48db-9222-7abb90b943f5.png">
@@ -99,13 +96,13 @@ SELECT location, date, population, total_cases,
 	ROUND(total_cases/population,6)*100 AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 WHERE location = 'Puerto Rico'
-ORDER BY percentage_population_infected DESC
+ORDER BY percentage_population_infected DESC;
 
 SELECT location, date, population, total_cases, 
 	ROUND(total_cases/population,6)*100 AS percentage_population_infected
 FROM covid. dbo.covid_deaths
 WHERE location = 'United States'
-ORDER BY percentage_population_infected DESC
+ORDER BY percentage_population_infected DESC;
 ```
 
 ### Countries with the **highest infection** rates 
@@ -144,39 +141,37 @@ Nonetheless, these countries have vast amounts of populations due to their size.
 4. Somalia - 4.98% with 1,361 deaths 
 5. Peru - 4.89% with 219,866  
 
+(#97 United States - 1.09%) 
 (#157 Puerto Rico - 0.53%)  
-(#97 United States - 1.09%)  
-
+ 
 Code: 
 ```
 --- Showing countries with the highest death rates compared to total cases
 SELECT TOP 5 location,
-       MAX(total_deaths) AS total_deaths
+	MAX(total_deaths) AS total_deaths
 FROM covid.dbo.covid_deaths
 WHERE continent IS NOT NULL
 GROUP BY location
 ORDER BY total_deaths DESC;
 
 SELECT TOP 5 location,
-	   MAX(total_cases) AS total_cases,
-       MAX(total_deaths) AS total_deaths,
-       ROUND(MAX(total_deaths)/MAX(total_cases)*100, 4) AS death_rate
+	MAX(total_cases) AS total_cases,
+	MAX(total_deaths) AS total_deaths,
+	ROUND(MAX(total_deaths)/MAX(total_cases)*100, 4) AS death_rate
 FROM covid.dbo.covid_deaths
 WHERE continent IS NOT NULL
 GROUP BY location
 ORDER BY death_rate DESC;
-
 ```
 ### Breaking things down by social class
-I was interested in analyzing how each social class was affected during the pandemic. The dataset provided us with three categories: High income, Upper middle income, Lower middle income, and low income.  
+I was interested in analyzing how each social class was affected during the pandemic. The dataset provided us with three categories: High income, Upper middle income, Lower middle income, and Low income.  
 ```
 --- Breaking things down by social class
 
 SELECT location,
 	MAX(CAST(total_deaths AS INT)) AS total_death_count 
 FROM covid. dbo.covid_deaths
-WHERE continent IS NULL AND
-		location IN ('Low income', 'High income','Upper middle income', 'Lower middle income','Low income')
+WHERE continent IS NULL AND location IN ('Low income', 'High income','Upper middle income', 'Lower middle income','Low income')
 GROUP BY location
 ORDER BY total_death_count DESC;
 ```
@@ -197,7 +192,7 @@ SELECT
 	SUM(new_deaths)/SUM(new_cases)*100 AS death_percentage
 FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
-ORDER BY 1,2
+ORDER BY 1,2;
 ```
 
 ### Vaccinations 
@@ -218,16 +213,16 @@ SELECT *,
     ROUND((people_vaccinated/population)*100,5) AS percent_vaccinated
 FROM pop_vs_vac
 WHERE location = 'United States')
-ORDER BY location, date
+ORDER BY location, date;
 ``` 
 As of April 12, 2023 the total number of people vaccinated in the United States is **338,289,856** or **79.828%** of the total population. 
 
-Initially, I observed that there was no data available for the "new_vaccinations" column for Puerto Rico. In order to investigate this further, I revisited the Excel spreadsheet to analyze the original data. It turns out that Puerto Rico indeed was missing this data. After further investigation in their website, I was not able to find a reason as to why this is. However, [this article](https://www.aha.org/news/blog/2022-07-22-digging-reasons-puerto-ricos-successful-covid-19-response) from the American Hospital Association, estimates that 95% of the population has received at least one dose of the vaccine. 
+Initially, I observed that there was no data available for the "new_vaccinations" column for Puerto Rico. In order to investigate this further, I revisited the Excel spreadsheet to analyze the original data. It turns out that Puerto Rico was indeed missing this data. After further investigation in their website, I was not able to find a reason as to why this is. However, [this article](https://www.aha.org/news/blog/2022-07-22-digging-reasons-puerto-ricos-successful-covid-19-response) from the American Hospital Association, estimates that 95% of the population has received at least one dose of the vaccine. As this data is critical for the next part of the project, I decided to exclude Puerto Rico from the analysis.
 
-I then created a temp table to summarize all this data by country. 
+I created a temp table to summarize all this data by country. 
 ```
-DROP TABLE IF EXISTS #percent_population_vaccinated
-CREATE TABLE #percent_population_vaccinated
+DROP TABLE IF EXISTS percent_population_vaccinated_by_country
+CREATE TABLE percent_population_vaccinated_by_country
 (
 continent NVARCHAR(255), 
 location NVARCHAR(255), 
@@ -236,9 +231,9 @@ population NUMERIC,
 total_people_vaccinated NUMERIC
 );
 
-INSERT INTO #percent_population_vaccinated
+INSERT INTO percent_population_vaccinated_by_country
 SELECT dea.continent, dea.location, dea.date, dea.population, 
-MAX(vac.people_vaccinated) OVER (PARTITION BY dea.location ORDER BY dea. location, dea.date) AS total_people_vaccinated
+	MAX(vac.people_vaccinated) OVER (PARTITION BY dea.location ORDER BY dea. location, dea.date) AS total_people_vaccinated
 FROM covid..covid_deaths dea
 JOIN covid..covid_vaccinations vac
 	ON dea.location = vac.location AND dea.date = vac.date;
@@ -247,9 +242,9 @@ SELECT location,
        MAX(population) AS population, 
        MAX(total_people_vaccinated) AS total_people_vaccinated,
        (MAX(total_people_vaccinated) / MAX(population)) * 100 AS percent_vaccinated
-FROM #percent_population_vaccinated
+FROM percent_population_vaccinated_by_country
 GROUP BY location
-ORDER BY location;
+ORDER BY percent_vaccinated DESC;
 ``` 
 
 # Sharing My Results 
@@ -269,7 +264,7 @@ As you can see, Europe had the most death counts with over 2 million deaths. Asi
 <img width="518" alt="map" src="https://user-images.githubusercontent.com/126125206/233473831-87afba1a-56a9-486d-98de-372651ec6a85.png">
 
 
-I created the following views for visualization purposes in SQL Server: 
+I created the following views for visualization purposes: 
 ```
 GO
 
