@@ -302,4 +302,8 @@ FROM covid. dbo.covid_deaths
 WHERE continent IS NOT NULL
 ```
 # Conclusion
+It's no doubt that COVID-19 has had a huge impacts in our lives. The virus has affected people from all walks of lives. This project demonstrates the significant impact of the pandemic on global healthcare systems, with widespread infections resulting in high death rates and a large number of fatalities. There has been 763,128,258 cases of COVID-19 as of April 12,2023 with over 6,899,687 deaths worldwide. These figures are staggering. Nonetheless, vaccinations have been promising about reducing th number of infections and deaths.
 
+There are significant differences in vaccination rates per country as shown by the data, with some countries having a high percentage of their populations vaccinated and others lagging behind. These differences are likely due to a variety of factors, including vaccine availability and distribution systems.  
+
+Overall, the COVID-19 pandemic has been a global health crisis that has touched the lives of millions of people around the world. While vaccinations offer hope for reducing the number of infections and deaths, it's important to continue to follow public health guidelines and work together to control the spreading of the virus.
